@@ -4,24 +4,24 @@
   var definitions = {},
       on = {},
       functionSignature = /^function[^(]+\((.*?)\)/,
-      waitingFor = null;
+      defineScript = null;
 
   function trim (value) {
     return value.trim();
   }
 
-  function define (id, dependencies, factory) {
+  function define (module_id, dependencies, factory) {
     if( typeof dependencies === 'function' ) {
       factory = dependencies;
-      if( id instanceof Array ) {
-        dependencies = id;
-        id = undefined;
+      if( module_id instanceof Array ) {
+        dependencies = module_id;
+        module_id = undefined;
       } else {
         dependencies = undefined;
       }
-    } else if( typeof id === 'function' ) {
-      factory = id;
-      id = undefined;
+    } else if( typeof module_id === 'function' ) {
+      factory = module_id;
+      module_id = undefined;
     }
 
     if( !factory ) {
@@ -32,22 +32,26 @@
       dependencies = factory.toString().match(functionSignature)[1].split(',').map(trim);
     }
 
-    if( id === undefined && waitingFor ) {
-      id = waitingFor;
-      waitingFor = null;
+    if( module_id === undefined && defineScript ) {
+      module_id = defineScript;
     }
+    defineScript = null;
 
-    var module = { exports : {} };
+    var module = { exports: {} };
 
     require.call({ locals: { module: module, exports: module.exports } }, dependencies, function () {
-      var result = factory.apply(arguments);
-      if( id ) {
-        definitions[id] = result === undefined ? module.exports : result;
-        if( on[id] ) {
-          on[id].forEach(function (listener) {
-            listener(result);
+
+      var result = factory.apply(null, arguments);
+
+      if( module_id ) {
+
+        definitions[module_id] = (result === undefined ? module.exports : result);
+
+        if( on[module_id] ) {
+          on[module_id].forEach(function (listener) {
+            listener(definitions[module_id]);
           });
-          delete on[id];
+          delete on[module_id];
         }
       }
     });
@@ -67,10 +71,11 @@
     var script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = libUrl(dependence);
-    script.onload = function () {
-      waitingFor = dependence;
-    };
     document.head.appendChild(script);
+    defineScript = dependence;
+    // script.onload = function () {
+    //   console.log('script.onload');
+    // };
   }
 
   function isResolved (value) {
@@ -101,28 +106,31 @@
     var resolutions = [],
         resolved = [];
 
-    dependencies.forEach(function (id, i, dependencies) {
-      if( locals[i] || definitions[id] ) {
+    dependencies.forEach(function (module_id, i, dependencies) {
+      resolved[i] = false;
 
-        resolutions[i] = locals[i] || definitions[id];
+      if( locals[module_id] || definitions[module_id] ) {
+
+        resolutions[i] = locals[module_id] || definitions[module_id];
         resolved[i] = true;
 
       } else {
 
-        on[id] = on[id] || [];
-        on[id].push(function (result) {
+        on[module_id] = on[module_id] || [];
+        on[module_id].push(function (result) {
           resolutions[i] = result;
+          resolved[i] = true;
           if( resolved.every(isResolved) ) {
-            callback.apply(resolutions);
+            callback.apply(null, resolutions);
           }
         });
 
-        loadLib(id);
+        loadLib(module_id);
       }
     });
 
-    if( dependencies.every(isResolved) ) {
-      callback.apply(resolutions);
+    if( resolved.every(isResolved) ) {
+      callback.apply(null, resolutions);
     }
   }
 
