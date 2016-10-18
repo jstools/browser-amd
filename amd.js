@@ -2,7 +2,8 @@
 (function (root) {
 
   var definitions = {},
-      on = {};
+      on = {},
+      functionSignature = /^function[^(]+\((.*?)\)/;
 
   function trim (value) {
     return value.trim();
@@ -27,7 +28,7 @@
     }
 
     if( !dependencies ) {
-      dependencies = factory.toString().match(/^function[^(]+\((.*?)\)/)[1].split(',').map(trim);
+      dependencies = factory.toString().match(functionSignature)[1].split(',').map(trim);
     }
 
     require(dependencies, function () {
