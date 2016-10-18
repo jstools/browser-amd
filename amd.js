@@ -3,7 +3,8 @@
 
   var definitions = {},
       on = {},
-      functionSignature = /^function[^(]+\((.*?)\)/;
+      functionSignature = /^function[^(]+\((.*?)\)/,
+      waitingFor = null;
 
   function trim (value) {
     return value.trim();
@@ -12,7 +13,7 @@
   function define (id, dependencies, factory) {
     if( typeof dependencies === 'function' ) {
       factory = dependencies;
-      if( typeof id === 'array' ) {
+      if( id instanceof Array ) {
         dependencies = id;
         id = undefined;
       } else {
@@ -31,10 +32,17 @@
       dependencies = factory.toString().match(functionSignature)[1].split(',').map(trim);
     }
 
-    require(dependencies, function () {
+    if( id === undefined && waitingFor ) {
+      id = waitingFor;
+      waitingFor = null;
+    }
+
+    var module = { exports : {} };
+
+    require.call({ locals: { module: module, exports: module.exports } }, dependencies, function () {
       var result = factory.apply(arguments);
       if( id ) {
-        definitions[id] = result;
+        definitions[id] = result === undefined ? module.exports : result;
         if( on[id] ) {
           on[id].forEach(function (listener) {
             listener(result);
@@ -59,6 +67,9 @@
     var script = document.createElement('script');
     script.type = 'text/javascript';
     script.src = libUrl(dependence);
+    script.onload = function () {
+      waitingFor = dependence;
+    };
     document.head.appendChild(script);
   }
 
@@ -67,13 +78,33 @@
   }
 
   function require (dependencies, callback) {
+    var locals = this === root ? {} : this.locals || {};
+
+    if( typeof dependencies === 'string' ) {
+      if( callback === undefined ) {
+        return locals[dependencies] || definitions[dependencies];
+      }
+      dependencies = [dependencies];
+    } else if( typeof dependencies === 'function' ) {
+      callback = dependencies;
+      dependencies = ['require', 'exports', 'module'];
+    }
+
+    if( !(dependencies instanceof Array) ) {
+      throw new Error('missing list of dependencies');
+    }
+
+    if( typeof callback !== 'function' ) {
+      throw new Error('missing callback');
+    }
+
     var resolutions = [],
         resolved = [];
 
     dependencies.forEach(function (id, i, dependencies) {
-      if( definitions[id] ) {
+      if( locals[i] || definitions[id] ) {
 
-        resolutions[i] = definitions[id];
+        resolutions[i] = locals[i] || definitions[id];
         resolved[i] = true;
 
       } else {
@@ -85,6 +116,7 @@
             callback.apply(resolutions);
           }
         });
+
         loadLib(id);
       }
     });
@@ -93,6 +125,10 @@
       callback.apply(resolutions);
     }
   }
+
+  require.toUrl = libUrl;
+
+  definitions.require = require;
 
   root.define = define;
   root.require = require;
