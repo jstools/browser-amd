@@ -4,7 +4,22 @@
   var definitions = {},
       on = {},
       functionSignature = /^function[^(]+\((.*?)\)/,
-      defineScript = null;
+      defineScript = null,
+      onSiteLoaded = (function () {
+        var listeners = [];
+
+        window.addEventListener('load', function (e) {
+          setTimeout(function () {
+            listeners.forEach(function (listener) {
+              listener();
+            });
+          }, 0);
+        });
+
+        return function (listener) {
+          listeners.push(listener);
+        };
+      })();
 
   function trim (value) {
     return value.trim();
@@ -129,7 +144,12 @@
           }
         });
 
-        loadLib(module_id);
+        onSiteLoaded(function () {
+          if( !definitions[module_id] ) {
+            loadLib(module_id);
+          }
+        });
+
       }
     });
 
