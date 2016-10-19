@@ -4,7 +4,8 @@
   "description": "simple browser amd loader",
   "main": "amd.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "$(npm bin)/uglifyjs amd.js --compress --mangle -o amd.min.js"
   },
   "repository": {
     "type": "git",
@@ -22,5 +23,8 @@
   "bugs": {
     "url": "https://github.com/jstools/browser-amd/issues"
   },
-  "homepage": "https://github.com/jstools/browser-amd#readme"
+  "homepage": "https://github.com/jstools/browser-amd#readme",
+  "devDependencies": {
+    "uglify-js": "^2.7.3"
+  }
 }
