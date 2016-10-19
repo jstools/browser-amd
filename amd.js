@@ -100,7 +100,11 @@
     }
 
     if( typeof callback !== 'function' ) {
-      throw new Error('missing callback');
+      if( callback === undefined && dependencies[dependencies.length - 1] instanceof Function ) {
+        callback = dependencies.pop();
+      } else {
+        throw new Error('missing callback');
+      }
     }
 
     var resolutions = [],
