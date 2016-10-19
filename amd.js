@@ -13,11 +13,16 @@
             listeners.forEach(function (listener) {
               listener();
             });
+            listeners = null;
           }, 0);
         });
 
         return function (listener) {
-          listeners.push(listener);
+          if( listeners ) {
+            listeners.push(listener);
+          } else {
+            listener();
+          }
         };
       })();
 
@@ -88,9 +93,6 @@
     script.src = libUrl(dependence);
     document.head.appendChild(script);
     defineScript = dependence;
-    // script.onload = function () {
-    //   console.log('script.onload');
-    // };
   }
 
   function isResolved (value) {
