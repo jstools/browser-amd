@@ -30,6 +30,11 @@
     return value.trim();
   }
 
+  function implicitDependencies (factory) {
+    var signature = factory.toString().match(functionSignature)[1].trim();
+    return signature ? signature.split(/ *, */).map(trim) : [];
+  }
+
   function define (module_id, dependencies, factory) {
     if( typeof dependencies === 'function' ) {
       factory = dependencies;
@@ -48,9 +53,7 @@
       throw new Error('factory not provided');
     }
 
-    if( !dependencies ) {
-      dependencies = factory.toString().match(functionSignature)[1].split(',').map(trim);
-    }
+    dependencies = dependencies || implicitDependencies(factory);
 
     if( module_id === undefined && defineScript ) {
       module_id = defineScript;
