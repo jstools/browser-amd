@@ -1,15 +1,15 @@
 {
-  "name": "browser-amd",
-  "version": "1.0.6",
+  "name": "clans",
+  "version": "1.0.0",
   "description": "simple browser amd loader",
-  "main": "amd.js",
+  "main": "clans.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "$(npm bin)/uglifyjs amd.js --compress --mangle -o amd.min.js"
+    "build": "$(npm bin)/uglifyjs clans.js --compress --mangle -o clans.min.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jstools/browser-amd.git"
+    "url": "git+https://github.com/kiltjs/clans.git"
   },
   "keywords": [
     "amd",
@@ -21,9 +21,9 @@
   "author": "Jesús Germade <jesus@germade.es>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/jstools/browser-amd/issues"
+    "url": "https://github.com/kiltjs/clans/issues"
   },
-  "homepage": "https://github.com/jstools/browser-amd#readme",
+  "homepage": "https://github.com/kiltjs/clans#readme",
   "devDependencies": {
     "uglify-js": "^2.7.3"
   }
