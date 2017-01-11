@@ -1,15 +1,15 @@
 {
-  "name": "clans",
+  "name": "aumd",
   "version": "1.0.10",
   "description": "simple browser amd loader",
-  "main": "clans.js",
+  "main": "aumd.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "$(npm bin)/uglifyjs clans.js --compress --mangle -o clans.min.js"
+    "build": "$(npm bin)/uglifyjs aumd.js --compress --mangle -o aumd.min.js"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kiltjs/clans.git"
+    "url": "git+https://github.com/kiltjs/aumd.git"
   },
   "keywords": [
     "amd",
@@ -21,9 +21,9 @@
   "author": "Jesús Germade <jesus@germade.es>",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/kiltjs/clans/issues"
+    "url": "https://github.com/kiltjs/aumd/issues"
   },
-  "homepage": "https://github.com/kiltjs/clans#readme",
+  "homepage": "https://github.com/kiltjs/aumd#readme",
   "devDependencies": {
     "uglify-js": "^2.7.3"
   }
