@@ -1,6 +1,6 @@
 {
   "name": "aumd",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "simple browser amd loader",
   "main": "aumd.js",
   "scripts": {

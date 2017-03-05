@@ -167,7 +167,14 @@
 
   definitions.require = require;
 
-  root.define = define;
-  root.require = require;
+  if( typeof exports === 'object' && typeof module !== 'undefined' ) {
+    module.exports = {
+      define: define,
+      require: require
+    };
+  } else {
+    root.define = define;
+    root.require = require;
+  }
 
 })(this);
