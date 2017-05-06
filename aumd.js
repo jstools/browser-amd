@@ -47,7 +47,11 @@
     } else if( typeof module_id === 'function' ) {
       factory = module_id;
       module_id = undefined;
+      dependencies = dependencies || ['require', 'exports', 'module'];
     }
+
+    if( !factory && dependencies[dependencies.length - 1] instanceof Function )
+      factory = dependencies.pop();
 
     if( !factory ) {
       throw new Error('factory not provided');
@@ -112,7 +116,7 @@
       dependencies = [dependencies];
     } else if( typeof dependencies === 'function' ) {
       callback = dependencies;
-      dependencies = ['require', 'exports', 'module'];
+      dependencies = [];
     }
 
     if( !(dependencies instanceof Array) ) {
